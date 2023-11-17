@@ -1,10 +1,11 @@
 <?php
 
-require('../../configs/database.php');
+require('../configs/database.php');
 
 
 if (isset($_POST['submit'])) {
-
+    
+    var_dump( $pdo);
     $error = false;
     $error_email = '';
     $error_password = '';
@@ -24,8 +25,10 @@ if (isset($_POST['submit'])) {
         $checkEmailExist = $pdo->prepare('SELECT email from admins where email = ?');
 
         $checkEmailExist->execute(array($email));
+        $results = $checkEmailExist->fetch(PDO::FETCH_ASSOC);
+        var_dump( $results);
 
-        if ($checkEmailExist->rowCount() >= 1) {
+        if ($results) {
             $error = true;
             $error_email = 'Email already taken';
         } else {
@@ -63,7 +66,7 @@ if (isset($_POST['submit'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    //css
+
     <link rel="stylesheet" href="../../assets/css/login.css">
     <title>PHP rental project</title>
 </head>
@@ -91,10 +94,10 @@ if (isset($error)) { ?>
             <input type="password" name="password">
         </div>
         <div class="row">   
-        <label for="password">Confirm password</label>
-            <input type="password" name="passsword">
+        <label for="confirmPassword">Confirm password</label>
+            <input type="password" name="confirmPassword">
         </div>
-        <button type="submit"> Register as admin</button>
+        <button type="submit" name='submit'> Register as admin</button>
         <div class="links">
             <div class="link">
                 <a href="../../index.php">Back to login</a>

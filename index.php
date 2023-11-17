@@ -1,128 +1,66 @@
-<?php
-
+<?php 
 require('./configs/database.php');
-session_start();
-
-//check if button is clicked
-
-if (isset($_POST['submit'])) {
-
-  //Check if the chebox are check
-
-  $logAdmin= $_POST['log_admin'];
-  $error =false;
-  $error_email = '';
-  $error_password= '';
-
-  $email= htmlspecialchars($_POST['email']);
-  $password= htmlspecialchars($_POST['password']);
-
-  if(!empty($email) AND !empty($password)){
-
-    
-  if(isset($logAdmin)){
-    //Login as Admin
-
-    //Check if the email is reconize in our database*
-
-    $checkEmailExist = $pdo->prepare('SELECT * from admins where email = ?');
-
-    $checkEmailExist->execute(array($email));
-
-    if($checkEmailExist->rowCount() >=1){
-
-      foreach($checkEmailExist as $result){
-
-        //Check if password and db password are
-
-        if(sha1($password) == $result['password']){
-          
-          $_SESSION['admin_logged']=true;
-          $_SESSION['admin_id']= $result['id'];
-          $_SESSION['admin_email']= $result['email'];
-
-          header('location: views/admin/index.php');
-
-        }else{
-
-          $error=true;
-          $error_password= 'Password wrong';
-        }
+include("./includes/header.php");
 
 
-      
-      }
-
-    }else{
-      $error= true;
-      $error_email = 'Email not reconize';
-    }
-
-  }else{
-    //Login as customer
-  }
-  }else{
-    $error= true;
-    $error_email= 'Email required';
-    $error_password= 'Password required';
-  }
-
-}
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PHP Car rental Project</title>
-  <link rel="stylesheet" href="./assets/css/login.css">
-</head>
+  <!-- <link rel="stylesheet" href='./assets/admins/bootstrap/dist/css/bootstrap.min.css' defer> -->
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
 
+   <link rel="stylesheet" href='./assets/styles_main.css' defer> 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+  <title>Online car rental</title>
+</head>
 <body>
 
-  <h1>Login To Your Dashboard</h1>
-  <form method="post">
 
-  <?php
-  
-  if(isset($error)){?> 
-  
-    <div class="error"><?= $error_email ?></div>
-    <div class="error"><?= $error_password ?></div>
-  <?php }
+<!-- content -->
+<div class="container text-center" style="width: 100%;" >
+  <div class="row align-items-start" style="width: 100%;">
 
-  ?>
-    <div class="row">
-      <label for="email">Email</label>
-      <input type="email" name="email" autocomplete="off" placeholder="email@example.com">
+
+<?php
+foreach($results as $result){?>
+<div class=class="col" style="width: 18rem; margin-left:1.5rem; margin-bottom:2rem;" >
+<div class="card" style="width: 18rem;">
+  <img  style="width: 18rem; height:13rem;" lass="card-img-top" src="./assets/images/<?= $result['img'];
+  ?>" alt="Card image cap">;
+
+  <div class="card-body">
+  <h5 class="card-title"><a href="details.php?car_id=<?=$result['id'] ?>
+  "><?php echo $result['name']; ?></a></h5>
+
+    <div style="height:6rem; margin-bottom:.5rem;"> 
+    <p class="card-text"> <?php echo $result['description'];
+   
+   ?></p>
+      
     </div>
-    <div class="row">
-      <label for="password">Password</label>
-      <input type="password" name="password">
-    </div>
-    <div style="display: flex; color:#8086a9;
-  ">
-      <input type="checkbox" name="log_admin">
-      <label for="">Log as admin</label>
-    </div>
-    <div style="display: flex; color:#8086a9;
-  ">
-      <div class="links">
-        <a href="/views/customer/signin" class="link">Create an account</a>
-        <a href="/views/admin/registration" class="link">Admin account</a>
-      </div>
-    </div>
-    <button type="submit" name="submit">Login</button>
-  </form>
+    <p class="card-text"><?php if($result['available'] !== 0) {echo "car is available for booking";
+    }?>
+    <small class="text-muted">
+
+    </small></p>
+    <a href="#" class="btn btn-primary" style="background-color:rgb(74, 185, 148);"> Book</a>
+  </div>
+</div>
+
+</div>
+<?php
+}
+?>
 
 
+</div>
 
+</div>
 </body>
-
-
-
 </html>
