@@ -46,11 +46,6 @@ if (isset($_POST['submit'])) {
           $error=true;
           $error_password= 'Password wrong';
         }
-
-
-      
-      
-
     }else{
       echo 'error email';
       $error= true;
@@ -59,15 +54,38 @@ if (isset($_POST['submit'])) {
 
   }else{
     //Login as customer
-  }
-  }else{
-    echo 'error email';
-    $error= true;
-    $error_email= 'Email required';
-    $error_password= 'Password required';
-  }
+    $checkEmailExist = $pdo->prepare('SELECT * FROM customers WHERE email = ?');
+    $checkEmailExist->execute(array($email));
+    $results = $checkEmailExist->fetch(PDO::FETCH_ASSOC);
 
+    if ($results) {
+      // Check if password and database password match
+      if (sha1($password) == $results['password']) {
+        $_SESSION['customer_logged'] = true;
+        $_SESSION['customer_id'] = $results['id'];
+        $_SESSION['customer_email'] = $results['email'];
+        var_dump( $_SESSION);
+      
+        header('location: index.php');
+        exit; // It's important to exit after a header redirect
+      } else {
+        $error = true;
+        $error_password = 'Password wrong';
+      }
+    } else {
+      $error = true;
+      $error_email = 'Email not recognized';
+    }
+  }
+} else {
+  $error = true;
+  $error_email = 'Email required';
+  $error_password = 'Password required';
 }
+  }
+  
+
+
 
 ?>
 

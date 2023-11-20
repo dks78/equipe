@@ -1,14 +1,7 @@
-
-<?php 
-require('./configs/database.php');
-
-$fetchCars = $pdo->prepare('SELECT * from cars');
-
-
-$fetchCars->execute();
-$results = $fetchCars->fetchAll(PDO::FETCH_ASSOC);
-
+<?php
+session_start();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -26,14 +19,14 @@ $results = $fetchCars->fetchAll(PDO::FETCH_ASSOC);
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 3rem;" >
   <div class="container-fluid" style="background-color:rgb(74, 185, 148);">
-    <a class="navbar-brand" href="./index.php">Car Rental Spider-Couchon</a>
+    <a class="navbar-brand" href="../index.php">Car Rental Spider-Cochon</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="./index.php">Home</a>
+          <a class="nav-link active" aria-current="page" href="../index.php">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Cars </a>
@@ -41,6 +34,12 @@ $results = $fetchCars->fetchAll(PDO::FETCH_ASSOC);
       
         <li class="nav-item">
           <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">About us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../customer/panier.php" >Panier</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../logout.php" >logout</a>
         </li>
       </ul>
       <form class="d-flex">

@@ -1,5 +1,6 @@
 <?php
-include("./includes/header.php");
+require('../configs/database.php');
+include("../includes/header.php");
 
 // Проверяем, есть ли car_id в запросе GET
 if (isset($_GET['car_id'])) {
@@ -22,13 +23,12 @@ if (isset($_GET['car_id'])) {
     if ($results) {
         // Выводим результаты через HTML
         foreach ($results as $result) {?>
-            <img  style="width: 18rem; height:13rem;" lass="card-img-top" src="./assets/images/<?= $result['img'];
+            <img  style="width: 18rem; height:13rem;" lass="card-img-top" src="../assets/images/<?= $result['img'];
             ?>" alt="Card image cap">;
             
             <?php
             echo '<h5 class="card-title"><a href="details.php">' . $result['name'] . '</a></h5>';
             echo '<p>' . $result['description'] . '</p>';
-            echo '<p>Hourly Price: $' . $result['hour_price'] . '</p>';
             echo '<p>Daily Price: $' . $result['day_price'] . '</p>';
             echo '<p>Monthly Price: $' . $result['month_price'] . '</p>';
             echo '<p>Availability: ' . ($result['available'] ? 'Yes' : 'No') . '</p>';

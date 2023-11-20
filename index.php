@@ -1,8 +1,16 @@
 <?php 
+
+
+
 require('./configs/database.php');
 include("./includes/header.php");
 
 
+$fetchCars = $pdo->prepare('SELECT * from cars');
+
+
+$fetchCars->execute();
+$results = $fetchCars->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -32,10 +40,10 @@ foreach($results as $result){?>
 <div class=class="col" style="width: 18rem; margin-left:1.5rem; margin-bottom:2rem;" >
 <div class="card" style="width: 18rem;">
   <img  style="width: 18rem; height:13rem;" lass="card-img-top" src="./assets/images/<?= $result['img'];
-  ?>" alt="Card image cap">;
+  ?>" alt="Card image cap">
 
   <div class="card-body">
-  <h5 class="card-title"><a href="details.php?car_id=<?=$result['id'] ?>
+  <h5 class="card-title"><a href="customer/details.php?car_id=<?=$result['id'] ?>
   "><?php echo $result['name']; ?></a></h5>
 
     <div style="height:6rem; margin-bottom:.5rem;"> 
@@ -49,7 +57,9 @@ foreach($results as $result){?>
     <small class="text-muted">
 
     </small></p>
-    <a href="#" class="btn btn-primary" style="background-color:rgb(74, 185, 148);"> Book</a>
+    <a href="customer/booking.php?car_id=<?=$result['id'] ?>"
+    class="btn btn-primary" style="background-color:rgb(74, 185, 148);"> Book</a>
+
   </div>
 </div>
 
