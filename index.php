@@ -1,7 +1,5 @@
 <?php 
 
-
-
 require('./configs/database.php');
 include("./includes/header.php");
 
@@ -11,6 +9,40 @@ $fetchCars = $pdo->prepare('SELECT * from cars');
 
 $fetchCars->execute();
 $results = $fetchCars->fetchAll(PDO::FETCH_ASSOC);
+displayCars($results);
+$searchTerm = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '';
+$filteredBooks = filterCars($pdo, $searchTerm);
+
+
+function filterCars(PDO $pdo, string $searchTerm): array
+{
+    $result = [];
+
+    try {
+        $sql = "SELECT * from cars
+                
+                WHERE name LIKE :searchTerm ";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':searchTerm', '%' . $searchTerm . '%', PDO::PARAM_STR);
+        $stmt->execute();
+
+        $errorInfo = $stmt->errorInfo();
+        if ($errorInfo[0] !== PDO::ERR_NONE) {
+            echo "Ошибка при выполнении запроса: " . $errorInfo[2];
+            return $result;
+        }
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results= $result;
+        var_dump($result);
+    } catch (PDOException $e) {
+        echo "Ошибка: " . $e->getMessage();
+    }
+
+    return $results;
+}
+
 
 ?>
 
@@ -29,6 +61,16 @@ $results = $fetchCars->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 
+<div>
+  <form method="get" action="" class="d-flex ms-auto" style="width: 18rem; margin-bottom:2rem; margin-right:5rem";>
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" id="search">
+    <button class="btn btn-outline-success" style='background-color: white;' type="submit">Search</button>
+  </form>
+</div>
+
+
+
+
 
 <!-- content -->
 <div class="container text-center" style="width: 100%;" >
@@ -36,6 +78,8 @@ $results = $fetchCars->fetchAll(PDO::FETCH_ASSOC);
 
 
 <?php
+function displayCars(array $results): void
+{
 foreach($results as $result){?>
 <div class=class="col" style="width: 18rem; margin-left:1.5rem; margin-bottom:2rem;" >
 <div class="card" style="width: 18rem;">
@@ -65,7 +109,7 @@ foreach($results as $result){?>
 
 </div>
 <?php
-}
+}}
 ?>
 
 
