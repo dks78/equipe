@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+
 require('./configs/database.php');
 include("./includes/header.php");
 require_once 'CarModel.php';
