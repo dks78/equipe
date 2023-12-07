@@ -1,0 +1,46 @@
+
+body{
+    background-image: url(/img/voiture.jpeg);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.inscrip{
+    background-color: white;
+    padding: 30px;
+    border-radius: 5%;
+    height: 420px;
+    width: 400px;
+
+}
+label{
+    font-size: 25px;
+    font-style: italic;
+   margin-bottom: 50px;
+}
+input{
+    padding: 20pc;
+}
+button{
+    margin: 30px;
+}
+.title{
+    color: blue;
+   font-style: italic;
+   text-align: center;
+}
+.d-grid{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+.mb-3 > .d-grid > button {
+    font-style: italic;
+    font-size: 25px;
+    font-weight: 900;
+    width: 150px;
+    padding: 10px;
+    margin: 30px;
+
+}

@@ -1,59 +1,145 @@
 <?php
 require('../configs/database.php');
 include("../includes/header.php");
-if (!$_SESSION['customer_logged']){
-    header('location: login.php');
-}
-if (isset($_SESSION['customer_id'])) {
-    $customer_id = $_SESSION['customer_id'];
-    $ordersQuery = $pdo->prepare('SELECT * FROM orders WHERE user_id = :customer_id');
-    $ordersQuery->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
-    $ordersQuery->execute();
-    $results = $ordersQuery->fetchAll(PDO::FETCH_ASSOC);
-
-    if ($results) {
-        echo '<table class="table table-bordered table-striped">';
-        echo '<thead>';
-        echo '<tr>';
-        echo '<th>Name</th>';
-        echo '<th>Price</th>';
-        echo '<th>Days</th>';
-        echo '<th>Insurance</th>';
-        echo '<th>Action</th>';
-        echo '</tr>';
-        echo '</thead>';
-        echo '<tbody>';
-
-        foreach ($results as $result) {
-            echo '<tr>';
-            echo '<td>' . $result['car_name'] . '</td>';
-            echo '<td>' . $result['price'] . '</td>';
-            echo '<td>' . $result['days'] . '</td>';
-            echo '<td>' . $result['insurance'] . '</td>';
-            echo '<td>';
-            // Add a form with a delete button for each result
-            echo '<form action="delete_order.php" method="post" style="display:inline;">';
-            echo '<input type="hidden" name="order_id" value="' . $result['id'] . '">';
-            echo '<input type="submit" class="btn btn-danger" name="delete" value="Delete">';
-            echo '</form>';
-
-            // Add an edit button linking to an edit_order.php page
-            echo '<form action="edit_order.php" method="post" style="display:inline;">';
-            echo '<input type="hidden" name="order_id" value="' . $result['id'] . '">';
-            echo '<input type="submit" class="btn btn-warning" name="edit" value="Edit">';
-            echo '</form>';
-            echo '</td>';
-            echo '</tr>';
-        }
-
-        echo '</tbody>';
-        echo '</table>';
-    } else {
-        echo "No results found for this user";
+class DateCalculator {
+    public static function calculateDaysDifference($startDate, $endDate) {
+        $startDatetime = new DateTime($startDate);
+        $endDatetime = new DateTime($endDate);
+        $interval = $startDatetime->diff($endDatetime);
+        return $interval->days;
     }
 }
-// ?>
-<!-- // <!DOCTYPE html>
+class Order {
+    private $name;
+    private $dayPrice;
+    private $monthPrice;
+    private $startDatetime;
+    private $endDatetime;
+    private $insurance;
+    private $carId;
+    private $customerId;
+    public function __construct($name, $dayPrice, $monthPrice, $startDatetime, $endDatetime, $insurance, $carId, $customerId) {
+        $this->name = $name;
+        $this->dayPrice = $dayPrice;
+        $this->monthPrice = $monthPrice;
+        $this->startDatetime = new DateTime($startDatetime);
+        $this->endDatetime = new DateTime($endDatetime);
+        $this->insurance = $insurance;
+        $this->carId = $carId;
+        $this->customerId = $customerId;
+    }
+    public function calculatePrice() {
+        $daysDifference = DateCalculator::calculateDaysDifference($this->startDatetime->format('Y-m-d'), $this->endDatetime->format('Y-m-d'));
+        if ($daysDifference >= 30) {
+            if ($this->insurance) {
+                $fullMonths = floor($daysDifference / 30);
+                $remainingDays = $daysDifference % 30;
+                $price = ($fullMonths * $this->monthPrice) + ($remainingDays * $this->dayPrice) + ($daysDifference * 15);
+            } else {
+                $fullMonths = floor($daysDifference / 30);
+                $remainingDays = $daysDifference % 30;
+                $price = ($fullMonths * $this->monthPrice) + ($remainingDays * $this->dayPrice);
+            }
+        } else {
+            if ($this->insurance) {
+                $price = $this->dayPrice * $daysDifference + ($daysDifference * 15);
+            } else {
+                $price = $this->dayPrice * $daysDifference;
+            }
+        }
+        return $price;
+    }
+}
+class OrderRepository {
+    private $pdo;
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
+    }
+    public function insertOrder(Order $order) {
+        $query = "INSERT INTO orders (car_name, start_date, end_date, insurance, price, days, user_id, car_id)
+        VALUES (:car_name, :start_date, :end_date, :insurance, :price, :days, :user_id, :car_id)";
+        $statement = $this->pdo->prepare($query);
+        $statement->bindValue(':car_name', $order->getName(), PDO::PARAM_STR);
+        $statement->bindValue(':car_id', $order->getCarId(), PDO::PARAM_INT);
+        $statement->bindValue(':start_date', $order->getStartDatetime()->format('Y-m-d'), PDO::PARAM_STR);
+        $statement->bindValue(':end_date', $order->getEndDatetime()->format('Y-m-d'), PDO::PARAM_STR);
+        $statement->bindValue(':user_id', $order->getCustomerId(), PDO::PARAM_INT);
+        $statement->bindValue(':insurance', $order->getInsurance(), PDO::PARAM_BOOL);
+        $statement->bindValue(':price', $order->calculatePrice(), PDO::PARAM_INT);
+        $statement->bindValue(':days', $order->calculateDaysDifference(), PDO::PARAM_INT);
+        $statement->execute();
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['car_name'];
+    $dayPrice = $_POST['day_price'];
+    $monthPrice = $_POST['month_price'];
+    $start_date = $_POST['start_date'];
+    $end_date = $_POST['end_date'];
+    $insurance = $_POST['insurance'];
+    $car_id = $_POST['carId'];
+    $customer_id = $_SESSION['customer_id'];
+    $order = new Order($name, $dayPrice, $monthPrice, $start_date, $end_date, $insurance, $car_id, $customer_id);
+    $orderRepository = new OrderRepository($pdo);
+    $orderRepository->insertOrder($order);
+}
+
+
+// require('../configs/database.php');
+// include("../includes/header.php");
+// if (!$_SESSION['customer_logged']){
+//     header('location: login.php');
+// }
+// if (isset($_SESSION['customer_id'])) {
+//     $customer_id = $_SESSION['customer_id'];
+//     $ordersQuery = $pdo->prepare('SELECT * FROM orders WHERE user_id = :customer_id');
+//     $ordersQuery->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+//     $ordersQuery->execute();
+//     $results = $ordersQuery->fetchAll(PDO::FETCH_ASSOC);
+
+//     if ($results) {
+//         echo '<table class="table table-bordered table-striped">';
+//         echo '<thead>';
+//         echo '<tr>';
+//         echo '<th>Name</th>';
+//         echo '<th>Price</th>';
+//         echo '<th>Days</th>';
+//         echo '<th>Insurance</th>';
+//         echo '<th>Action</th>';
+//         echo '</tr>';
+//         echo '</thead>';
+//         echo '<tbody>';
+
+//         foreach ($results as $result) {
+//             echo '<tr>';
+//             echo '<td>' . $result['car_name'] . '</td>';
+//             echo '<td>' . $result['price'] . '</td>';
+//             echo '<td>' . $result['days'] . '</td>';
+//             echo '<td>' . $result['insurance'] . '</td>';
+//             echo '<td>';
+//             // Add a form with a delete button for each result
+//             echo '<form action="delete_order.php" method="post" style="display:inline;">';
+//             echo '<input type="hidden" name="order_id" value="' . $result['id'] . '">';
+//             echo '<input type="submit" class="btn btn-danger" name="delete" value="Delete">';
+//             echo '</form>';
+
+//             // Add an edit button linking to an edit_order.php page
+//             echo '<form action="edit_order.php" method="post" style="display:inline;">';
+//             echo '<input type="hidden" name="order_id" value="' . $result['id'] . '">';
+//             echo '<input type="submit" class="btn btn-warning" name="edit" value="Edit">';
+//             echo '</form>';
+//             echo '</td>';
+//             echo '</tr>';
+//         }
+
+//         echo '</tbody>';
+//         echo '</table>';
+//     } else {
+//         echo "No results found for this user";
+//     }
+// }
+// 
+ // <!DOCTYPE html>
 // <html lang="en">
 // <head>
 //     <meta charset="UTF-8">
@@ -114,3 +200,4 @@ if (isset($_SESSION['customer_id'])) {
 //     </div>
 // </body>
 // </html> -->
+?>

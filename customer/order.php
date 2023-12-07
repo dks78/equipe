@@ -79,15 +79,5 @@ $statement->bindValue(':insurance', $insurance, \PDO::PARAM_BOOL);
 $statement->bindValue(':price', $price, \PDO::PARAM_INT);
 $statement->bindValue(':days', $days_difference, \PDO::PARAM_INT);
 $statement->execute();
-    
-  
-      
-   
-
-
-   
-
-
-
 
 ?>

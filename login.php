@@ -59,12 +59,11 @@ if (isset($_POST['valid_connection'])) {
         </div>
         <div style="display: flex; color:#8086a9;">
             <div class="links">
-                <a href="/views/customer/signin" class="link">Create an account</a>
+                <a href="inscription.php" class="link">Create an account</a>
                 <a href="/views/admin/registration" class="link">Admin account</a>
             </div>
         </div>
         <button type="submit" name="valid_connection">Login</button>
-        <a href="inscription.php">Inscription</a>
     </form>
 </body>
 </html>
