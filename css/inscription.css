@@ -1,0 +1,30 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url(/img/voiture.jpeg);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* background-position:  center; */
+}
+
+.inscrip{
+    background-color: white;
+    padding: 30px;
+    border-radius: 5%;
+    height: 420px;
+}
+label{
+    font-size: 25px;
+    font-style: italic;
+   margin-bottom: 50px;
+}
+input{
+    padding: 20pc;
+}
+button{
+    margin: 30px;
+}
